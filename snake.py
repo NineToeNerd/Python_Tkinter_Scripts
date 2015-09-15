@@ -15,10 +15,16 @@ WIDTH = 500
 HEIGHT = 500
 
 class Snake(Frame):
+    '''
+    The classic Snake arcade game implemented as a frame in Tkinter.
+
+    First, initialize the game, then respond to arrow key events by moving the
+    snake in the direction the arrow key was pressed, and if the arrow keys
+    were not pressed, respond to mouse-click events to move the snake.
+    '''
 
     def __init__(self):
         Frame.__init__(self)
-        #Set up the main window frame as a grid
         self.master.title("Snake *** Try to beat the high score! ***")
         self.grid()
 
@@ -27,11 +33,12 @@ class Snake(Frame):
         frame1.grid()
 
         #Add a canvas to frame1 as self.canvas member 
-        self.canvas = Canvas(frame1, width = WIDTH, height = HEIGHT, bg ="white")
+        self.canvas = Canvas(frame1, width = WIDTH, height = HEIGHT,
+                             bg ="white")
         self.canvas.grid(columnspan = 3)
         self.canvas.focus_set()
-        self.canvas.bind("<Button-1>", self.create)
-        self.canvas.bind("<Key>", self.create)
+        self.canvas.bind("<Button-1>", self.onEvent)
+        self.canvas.bind("<Key>", self.onEvent)
 
         #Create a "New Game" button
         newGame = Button(frame1, text = "New Game", command = self.new_game)
@@ -44,10 +51,6 @@ class Snake(Frame):
         self.high_score_label = Label(frame1)
         self.high_score_label.grid(row = 1, column = 2)
 
-        #Direction label (for debugging purpose)
-        #self.direction_label = Label(frame1, text = "Direction")
-        #self.direction_label.grid(row = 1, column = 2)
-
         self.new_game()
 
     def new_game(self):
@@ -59,33 +62,38 @@ class Snake(Frame):
         rectWidth = WIDTH/25
 
         #Initialize snake to 3 rectangles
-        rect1 = self.canvas.create_rectangle(WIDTH/2-rectWidth/2, HEIGHT/2-rectWidth/2, WIDTH/2+rectWidth/2\
-                                             , HEIGHT/2+rectWidth/2, outline="#dbf", fill="#dbf"\
-                                             , tag="rect1")
-        rect2 = self.canvas.create_rectangle(WIDTH/2-rectWidth/2, HEIGHT/2-rectWidth/2, WIDTH/2+rectWidth/2\
-                                             , HEIGHT/2+rectWidth/2, outline="#dbf", fill="#dbf"\
-                                             , tag="rect2")
-        rect3 = self.canvas.create_rectangle(WIDTH/2-rectWidth/2, HEIGHT/2-rectWidth/2, WIDTH/2+rectWidth/2\
-                                             , HEIGHT/2+rectWidth/2, outline="#dbf", fill="#dbf"\
-                                             , tag="rect3")
+        rect1 = self.canvas.create_rectangle(WIDTH/2-rectWidth/2, HEIGHT/2-\
+                                             rectWidth/2, WIDTH/2+rectWidth/2,
+                                             HEIGHT/2+rectWidth/2, outline=\
+                                             "#dbf", fill="#dbf", tag="rect1")
+        rect2 = self.canvas.create_rectangle(WIDTH/2-rectWidth/2, HEIGHT/2-\
+                                             rectWidth/2, WIDTH/2+rectWidth/2,
+                                             HEIGHT/2+rectWidth/2, outline=\
+                                             "#dbf", fill="#dbf", tag="rect2")
+        rect3 = self.canvas.create_rectangle(WIDTH/2-rectWidth/2, HEIGHT/2-\
+                                             rectWidth/2, WIDTH/2+rectWidth/2,
+                                             HEIGHT/2+rectWidth/2, outline=\
+                                             "#dbf", fill="#dbf", tag="rect3")
 
 
 
         #initialize variables that contribute to smooth gameplay below:
         #
-        #set rectangle width and height variables for use with new rectangles on the canvas
+        #set rectangle width variable for use with new rectangles on the canvas
         self.rectWidth = rectWidth
 
-        #lastDirection recorded because first 2 rectangles always overlap while moving,
-        #but if user goes right then immediately left the snake should run into itself and
-        #therefore end the game (See below functions self.check_collide and self.end_game)
+        #lastDirection recorded because first 2 rectangles always overlap while
+        #moving, but if user goes right then immediately left the snake should
+        #run into itself and therefore end the game (See below functions
+        #self.check_collide and self.end_game)
         self.lastDirection = None
         self.direction = None
 
         #Used to force snake to expand out on first move
         self.started = False
 
-        #Used to force game loop to halt when a collision occurs/snake out of bounds
+        #Used to force game loop to halt when a collision occurs/snake out of
+        #bounds
         self.game_over = False
 
         #Initialize game score to 0
@@ -110,7 +118,7 @@ class Snake(Frame):
         self.move()
         
 
-    def create(self, event):
+    def onEvent(self, event):
         self.lastDirection = self.direction
         if self.game_over == False:
             if event.keycode == 111:
@@ -123,20 +131,12 @@ class Snake(Frame):
                 self.direction = "left"
             elif event.x < WIDTH/2 and HEIGHT/3 < event.y < HEIGHT-HEIGHT/3:
                 self.direction = "left"
-                #(Debug)
-                #self.direction_label["text"] = "LEFT"
             elif event.x > WIDTH/2 and HEIGHT/3 < event.y < HEIGHT-HEIGHT/3:
                 self.direction= "right"
-                #(Debug)
-                #self.direction_label["text"] = "RIGHT"
             elif WIDTH/3 < event.x < WIDTH-WIDTH/3 and event.y < HEIGHT/2:
                 self.direction = "up"
-                #(Debug)
-                #self.direction_label["text"] = "UP"
             elif WIDTH/3 < event.x < WIDTH-WIDTH/3 and event.y > HEIGHT/2:
                 self.direction= "down"
-                #(Debug)
-                #self.direction_label["text"] = "DOWN"
 
     def first_movement(self):
         w = self.rectWidth
@@ -179,20 +179,22 @@ class Snake(Frame):
                 endRect = self.rectangles.pop()
                 frontCoords = self.canvas.coords(self.rectangles[0])
                 endCoords = self.canvas.coords(endRect)
-                #(Below for Debugging)
-                #print self.direction
-                #print "Front: " + str(frontCoords) + " Back: " + str(endCoords)
+                
                 if self.direction == "left":
-                    self.canvas.move(self.canvas.gettags(endRect), int(frontCoords[0]-endCoords[0])-w,\
+                    self.canvas.move(self.canvas.gettags(endRect),
+                                     int(frontCoords[0]-endCoords[0])-w,
                                      int(frontCoords[1]-endCoords[1]))
                 elif self.direction == "down":
-                    self.canvas.move(self.canvas.gettags(endRect), int(frontCoords[0]-endCoords[0]),\
+                    self.canvas.move(self.canvas.gettags(endRect),
+                                     int(frontCoords[0]-endCoords[0]),
                                      int(frontCoords[1]-endCoords[1])+w)
                 elif self.direction == "right":
-                    self.canvas.move(self.canvas.gettags(endRect), int(frontCoords[0]-endCoords[0])+w,\
+                    self.canvas.move(self.canvas.gettags(endRect),
+                                     int(frontCoords[0]-endCoords[0])+w,
                                      int(frontCoords[1]-endCoords[1]))
                 elif self.direction == "up":
-                    self.canvas.move(self.canvas.gettags(endRect), int(frontCoords[0]-endCoords[0]),\
+                    self.canvas.move(self.canvas.gettags(endRect),
+                                     int(frontCoords[0]-endCoords[0]),
                                      int(frontCoords[1]-endCoords[1])-w)
                 self.canvas.after(100)
                 self.rectangles.insert(0, endRect)
@@ -211,8 +213,10 @@ class Snake(Frame):
             self.dot = None
         dotX = random.random()*(WIDTH-self.rectWidth*2) + self.rectWidth
         dotY = random.random()*(HEIGHT-self.rectWidth*2) + self.rectWidth
-        self.dot = self.canvas.create_rectangle(dotX,dotY,dotX+self.rectWidth,dotY+self.rectWidth\
-                                                ,outline="#ddd", fill="#ddd", tag="dot")
+        self.dot = self.canvas.create_rectangle(dotX,dotY,dotX+self.rectWidth,
+                                                dotY+self.rectWidth,
+                                                outline="#ddd", fill="#ddd",
+                                                tag="dot")
 
     def grow(self):
         w = self.rectWidth
@@ -257,8 +261,8 @@ class Snake(Frame):
     def check_bounds(self):
         coordinates = self.canvas.coords(self.rectangles[0])
         if len(coordinates) > 0:
-            if coordinates[0] < 0 or coordinates[1] < 0 or coordinates[2] > WIDTH\
-               or coordinates[3] > HEIGHT:
+            if coordinates[0] < 0 or coordinates[1] < 0 or coordinates[2] >\
+                    WIDTH or coordinates[3] > HEIGHT:
                 self.end_game()
 
     def check_collide(self):
@@ -269,9 +273,12 @@ class Snake(Frame):
             #coords = self.canvas.coords(rect)
             #print "Front: " + str(frontCoords) + "coords: " + str(coords)
 
-        #Check to see if the snake's head(front) is overlapping anything and handle it below
-        overlapping = self.canvas.find_overlapping(frontCoords[0],frontCoords[1]\
-                                                         ,frontCoords[2],frontCoords[3])
+        #Check to see if the snake's head(front) is overlapping anything and
+        #handle it below
+        overlapping = self.canvas.find_overlapping(frontCoords[0],
+                                                   frontCoords[1],
+                                                   frontCoords[2],
+                                                   frontCoords[3])
         for item in overlapping:
             if item == self.dot:
                 #Snake collided with dot, grow snake and move dot
@@ -297,9 +304,5 @@ class Snake(Frame):
             scoreFile.close()
             self.canvas.create_text(WIDTH/2,HEIGHT/2+20,text=\
                                     "You beat the high score!")
-            
-        #(Debug)
-        #self.direction_label["text"] = "ENDED"
-
 
 Snake().mainloop()
