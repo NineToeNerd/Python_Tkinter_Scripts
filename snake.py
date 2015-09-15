@@ -247,14 +247,12 @@ class Snake(Frame):
         elif self.direction == "up":
             y1 += w
             y2 += w
-        #(Debug)
-        #print self.direction
-        #print "new coords: " + str(x1) + ", " + str(y1) + ", " + str(x2) + ", " + str(y2)
-        thisRect = self.canvas.create_rectangle(x1, y1, x2, y2, outline="#dbf",\
+        
+        thisRect = self.canvas.create_rectangle(x1, y1, x2, y2, outline="#dbf",
                                      fill="#dbf", tag=thisTag)
-        #print str(self.rectangles)
+        
         self.rectangles.append(thisRect)
-        #print str(self.rectangles)
+        
         lock.release()
         
 
@@ -267,11 +265,6 @@ class Snake(Frame):
 
     def check_collide(self):
         frontCoords = self.canvas.coords(self.rectangles[0])
-
-        #(For Debugging)
-        #for rect in self.rectangles:
-            #coords = self.canvas.coords(rect)
-            #print "Front: " + str(frontCoords) + "coords: " + str(coords)
 
         #Check to see if the snake's head(front) is overlapping anything and
         #handle it below
